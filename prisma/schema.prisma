@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// COMPANY - Empresa (dados do cliente)
+// ============================================================
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  tradeName String?  // Nome fantasia
+  document  String   @unique // CNPJ
+  email     String
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branches  Branch[]
+  employees Employee[]
+  roles     Role[]
+
+  @@map("companies")
+}
+
+// ============================================================
+// BRANCH - Filial
+// ============================================================
+
+model Branch {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   // Código interno (MATRIZ, FILIAL01, etc)
+  address   String?
+  city      String?
+  state     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  employees Employee[]
+
+  @@unique([companyId, code])
+  @@map("branches")
+}
+
+// ============================================================
+// EMPLOYEE - Funcionário (que também é o usuário do sistema)
+// ============================================================
+
+model Employee {
+  id           String   @id @default(uuid())
+  
+  // Dados pessoais
+  name         String
+  email        String
+  cpf          String
+  phone        String?
+  birthDate    DateTime?
+  
+  // Dados profissionais
+  registration String?  // Matrícula
+  position     String?  // Cargo
+  department   String?  // Departamento
+  hireDate     DateTime @default(now())
+  terminationDate DateTime?
+  
+  // Status
+  isActive     Boolean  @default(true)
+  
+  // ═══════════════════════════════════════════════════════════
+  // ACESSO AO SISTEMA (autenticação)
+  // ═══════════════════════════════════════════════════════════
+  hasSystemAccess Boolean  @default(false) // Pode acessar o sistema?
+  password        String?                   // Hash da senha (só se hasSystemAccess)
+  lastLoginAt     DateTime?
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relacionamentos
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  roleId String?
+  role   Role? @relation(fields: [roleId], references: [id])
+
+  @@unique([companyId, email])
+  @@unique([companyId, cpf])
+  @@index([companyId, isActive])
+  @@map("employees")
+}
+
+// ============================================================
+// ROLE - Perfil de acesso
+// ============================================================
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  employees   Employee[]
+  permissions RolePermission[]
+
+  @@unique([companyId, name])
+  @@map("roles")
+}
+
+// ============================================================
+// PERMISSION - Permissões do sistema
+// ============================================================
+
+model Permission {
+  id          String   @id @default(uuid())
+  code        String   @unique // employees.view, employees.create, etc
+  name        String
+  description String?
+  module      String   // auth, employees, etc
+  createdAt   DateTime @default(now())
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  roleId String
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
