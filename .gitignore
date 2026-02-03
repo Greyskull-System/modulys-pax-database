@@ -1,8 +1,8 @@
 # Dependencies
 node_modules/
 
-# Build
-dist/
+# Build (dist/ versionado para consumo via git install)
+# dist/
 
 # Environment
 .env
