@@ -1,7 +1,7 @@
 {
-  "name": "@grayskull/database",
+  "name": "@modulys-pax/database",
   "version": "1.0.0",
-  "description": "Database connection and Prisma client for Grayskull ERP",
+  "description": "Database connection and Prisma client for Modulys Pax",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -16,7 +16,7 @@
     "db:seed": "ts-node prisma/seed.ts",
     "prepare": "husky"
   },
-  "keywords": ["prisma", "database", "Grayskull", "erp"],
+  "keywords": ["prisma", "database", "modulys-pax", "erp"],
   "author": "",
   "license": "ISC",
   "dependencies": {

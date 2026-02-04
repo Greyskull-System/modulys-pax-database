@@ -1,17 +1,17 @@
-# @grayskull/database
+# @modulys-pax/database
 
-Módulo de conexão com banco de dados e Prisma Client para o sistema Grayskull ERP.
+Módulo de conexão com banco de dados e Prisma Client para o sistema Modulys Pax.
 
 ## Instalação
 
 ```bash
-npm install github:seu-usuario/grayskull-database
+npm install github:seu-usuario/modulys-pax-database
 ```
 
 ## Uso
 
 ```typescript
-import { PrismaClient, prisma } from '@grayskull/database';
+import { PrismaClient, prisma } from '@modulys-pax/database';
 
 // Usando a instância singleton
 const users = await prisma.user.findMany();
@@ -25,7 +25,7 @@ const client = new PrismaClient();
 Defina a variável de ambiente `DATABASE_URL`:
 
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/grayskull_db?schema=public"
+DATABASE_URL="postgresql://user:password@localhost:5432/modulys_pax_db?schema=public"
 ```
 
 ## Scripts
